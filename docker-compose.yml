@@ -1,0 +1,27 @@
+services:
+  db:
+    container_name: wissquiz_db
+    build:
+      context: ./backend/src/main/resources/Database
+    environment:
+      MYSQL_ROOT_PASSWORD: schnappie
+    networks:
+      - mynet123
+
+  api:
+    container_name: wissquiz_api
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      MYSQL_HOST: wissquiz_db
+      ENV_VAR: OK
+    depends_on:
+      - db
+    networks:
+      - mynet123
+
+networks:
+  mynet123:
+    name: mynet123
