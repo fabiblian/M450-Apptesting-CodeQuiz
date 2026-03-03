@@ -5,6 +5,8 @@ services:
       context: ./backend/src/main/resources/Database
     environment:
       MYSQL_ROOT_PASSWORD: schnappie
+    ports:
+      - "3306:3306"
     networks:
       - mynet123
     healthcheck:
