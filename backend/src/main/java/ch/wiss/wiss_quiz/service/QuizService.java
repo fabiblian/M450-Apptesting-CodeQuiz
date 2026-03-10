@@ -32,10 +32,10 @@ public class QuizService {
 
         if (copy.size() > maxQuestions) {
             Collections.shuffle(copy);
-            return copy.subList(0, maxQuestions);
+            
         }
-
-        return copy;
+        int limit = Math.min(questions.size(), maxQuestions);
+        return copy.subList(0, limit);
     }
 
     public boolean hasEnoughQuestions(List<Question> questions) {
