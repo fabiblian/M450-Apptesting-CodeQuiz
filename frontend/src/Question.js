@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "./Button.js";
+import "./Question.css";
 
 class Question extends React.Component {
   render() {

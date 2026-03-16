@@ -1,106 +1,174 @@
-import React from "react"
-import './GameSession.css';
-import Question from "./Question.js"
+import React from "react";
+import "./GameSession.css";
+import Question from "./Question.js";
 import API_BASE_URL from "./api";
 
 /**
-* handles a set of Questions
-*/
-class GameSession extends React.Component{
-
-    constructor(props){
-      super(props)
-      this.state = {
-        score: 0,
-        index: 0,
-        questions: typeof props.questions==='undefined' ? [] : props.questions,
-        correct: null,
-      }
-      this.fetchAnswer = this.fetchAnswer.bind(this)
-      this.nextQuestion =this.nextQuestion.bind(this)
-    }
-
-    componentDidMount(){
-      if(this.state.questions.length === 0){
-        fetch(API_BASE_URL + "/quiz?cat_id=1")
-          .then(response => response.json())
-          .then(data => this.setState({questions: data}))
-          .catch(err => {console.log(err)})
-      }
-      else {
-        console.log("nothing to do")
-      }
-    }
-
-    fetchAnswer = (selectedAnswer) => {
-      if (this.state.correct !== null) {
-        return;
-      }
-
-      const currentQuestion = this.state.questions[this.state.index];
-      const correctAnswer = currentQuestion.answers.find(
-        (answer) => answer.correct === true
-      );
-
-      const isCorrect =
-        correctAnswer !== undefined && correctAnswer.id === selectedAnswer.id;
-
-      this.setState({
-        correct: isCorrect,
-        score: this.state.score + (isCorrect ? 100 : 0)
-      });
+ * handles a set of Questions
+ */
+class GameSession extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      score: 0,
+      index: 0,
+      questions: typeof props.questions === "undefined" ? [] : props.questions,
+      correct: null,
+      categories: [],
+      selectedCategory: ""
     };
 
-    nextQuestion(){
-      this.setState({
-        index: this.state.index+1,
-        correct: null,
+    this.fetchAnswer = this.fetchAnswer.bind(this);
+    this.nextQuestion = this.nextQuestion.bind(this);
+    this.handleCategoryChange = this.handleCategoryChange.bind(this);
+    this.startQuizForSelectedCategory = this.startQuizForSelectedCategory.bind(this);
+  }
+
+  componentDidMount() {
+    fetch(API_BASE_URL + "/category")
+      .then((response) => response.json())
+      .then((data) => {
+        const firstCategoryId = data.length > 0 ? String(data[0].id) : "";
+        this.setState(
+          {
+            categories: data,
+            selectedCategory: firstCategoryId
+          },
+          () => {
+            if (this.state.questions.length === 0 && this.state.selectedCategory !== "") {
+              this.startQuizForSelectedCategory();
+            }
+          }
+        );
       })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  handleCategoryChange(event) {
+    this.setState({
+      selectedCategory: event.target.value
+    });
+  }
+
+  startQuizForSelectedCategory() {
+    if (!this.state.selectedCategory) {
+      return;
     }
 
-    render(){
-      console.log("Q-Index:" + this.state.index)
+    fetch(API_BASE_URL + "/quiz?cat_id=" + this.state.selectedCategory)
+      .then((response) => response.json())
+      .then((data) =>
+        this.setState({
+          questions: data,
+          index: 0,
+          score: 0,
+          correct: null
+        })
+      )
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
-      let feedback = ""
-      if (this.state.correct !== null){
-        feedback = <div className="feedback">
-          <h4>{ this.state.correct?"Hurra":"Ohh nein" }</h4>
-          <button onClick={ this.nextQuestion }>Next</button>
+  fetchAnswer = (selectedAnswer) => {
+    if (this.state.correct !== null) {
+      return;
+    }
+
+    const currentQuestion = this.state.questions[this.state.index];
+    const correctAnswer = currentQuestion.answers.find(
+      (answer) => answer.correct === true
+    );
+
+    const isCorrect =
+      correctAnswer !== undefined && correctAnswer.id === selectedAnswer.id;
+
+    this.setState({
+      correct: isCorrect,
+      score: this.state.score + (isCorrect ? 100 : 0)
+    });
+  };
+
+  nextQuestion() {
+    this.setState({
+      index: this.state.index + 1,
+      correct: null
+    });
+  }
+
+  render() {
+    let feedback = "";
+    if (this.state.correct !== null) {
+      feedback = (
+        <div>
+          <h4>{this.state.correct ? "Hurra" : "Ohh nein"}</h4>
+          <button onClick={this.nextQuestion}>Next</button>
         </div>
-      }
+      );
+    }
 
-      let q = ""
-      if (this.state.index < this.state.questions.length){
-        q = <Question
-        key = { this.state.index } //extrem wichtig für refresh beim weiterschalten
-        question = { this.state.questions[this.state.index].question }
-        answers = { this.state.questions[this.state.index].answers }
-        callback = { this.fetchAnswer }
-      />} else if (this.state.questions.length === 0){
-        q = <div>
+    let q = "";
+    if (this.state.index < this.state.questions.length) {
+      q = (
+        <Question
+          question={this.state.questions[this.state.index].question}
+          answers={this.state.questions[this.state.index].answers}
+          callback={this.fetchAnswer}
+        />
+      );
+    } else if (this.state.questions.length === 0) {
+      q = (
+        <div>
           <h1>Error fetching questions</h1>
           <h2>Please fix me</h2>
         </div>
-      } else {
-        q = <div>
+      );
+    } else {
+      q = (
+        <div>
           <h1>Congrats, you made it!</h1>
           <h2>No more questions</h2>
         </div>
-      }
-      return (
-        <div className="game-session">
-          <div className="session-status">
-            <span className="left">Question: { Math.min(this.state.questions.length, this.state.index+1) } / { this.state.questions.length }</span>
-            <span className="right">Score: { this.state.score }</span>
-          </div>
-          { q }
-          <div>
-            { feedback }
-          </div>
-        </div>
-      )
+      );
     }
 
+    return (
+      <div>
+        <div style={{ marginBottom: "1rem" }}>
+          <label htmlFor="category-select">Kategorie: </label>
+          <select
+            id="category-select"
+            value={this.state.selectedCategory}
+            onChange={this.handleCategoryChange}
+          >
+            {this.state.categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+
+          <button
+            style={{ marginLeft: "0.5rem" }}
+            onClick={this.startQuizForSelectedCategory}
+          >
+            Quiz starten
+          </button>
+        </div>
+
+        <div>
+          Question: {Math.min(this.state.questions.length, this.state.index + 1)} /{" "}
+          {this.state.questions.length} Score: {this.state.score}
+        </div>
+
+        {q}
+
+        {feedback}
+      </div>
+    );
+  }
 }
 
-export default GameSession
+export default GameSession;

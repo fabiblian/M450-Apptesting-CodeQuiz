@@ -12,3 +12,19 @@
 .right {
   text-align: right;
 }
+
+button {
+  font-size: 18px;
+  padding: 10px 16px;
+}
+
+#category-select {
+  font-size: 18px;
+  padding: 8px 12px;
+  margin-left: 10px;
+  border-radius: 5px;
+}
+
+select {
+  min-width: 220px;
+}
