@@ -11,7 +11,6 @@ import ch.wiss.wiss_quiz.model.CategoryRepository;
 import ch.wiss.wiss_quiz.model.Question;
 import ch.wiss.wiss_quiz.model.QuestionRepository;
 import ch.wiss.wiss_quiz.model.Answer;
-import ch.wiss.wiss_quiz.model.AnswerRepository;
 
 @Service
 public class QuizService {
@@ -66,6 +65,7 @@ public class QuizService {
 
         return pickQuizQuestions(questions, 3);
     }
+    
     public boolean validateQuestionForQuiz(Question question) {
 
         if (question == null) {
@@ -103,5 +103,38 @@ public class QuizService {
 
         return correctAnswers == 1;
     }    
+    
+    public boolean categoryHasEnoughValidQuestions(Integer categoryId, int requiredCount) {
 
+        if (categoryId == null || requiredCount <= 0) {
+            return false;
+        }
+
+        Category category = categoryRepository.findById(categoryId).orElse(null);
+        if (category == null) {
+            return false;
+        }
+
+        List<Question> questions = questionRepository.findByCategory(category);
+        int validCount = countValidQuestions(questions);
+
+        return validCount >= requiredCount;
+    }
+    
+    public int countValidQuestions(List<Question> questions) {
+
+        if (questions == null || questions.isEmpty()) {
+            return 0;
+        }
+
+        int count = 0;
+
+        for (Question question : questions) {
+            if (validateQuestionForQuiz(question)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
 }

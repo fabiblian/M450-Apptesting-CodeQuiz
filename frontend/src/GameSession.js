@@ -32,25 +32,24 @@ class GameSession extends React.Component{
       }
     }
 
-    fetchAnswer(answer){
-      if (this.state.correct === null){
-        const currentCorrectAnswer = this.state.questions[this.state.index].answers.filter(function(x){ return x.correct===true})[0].answer
-        let correct = false
-        let points = 0;
-        answer.target.classList.add('wrong')
-
-        if (currentCorrectAnswer === answer.target.innerHTML){
-          correct = true
-          points = 100
-          answer.target.classList.add('correct')
-        }
-
-        this.setState({
-          correct: correct,
-          score: this.state.score + points
-        })
+    fetchAnswer = (selectedAnswer) => {
+      if (this.state.correct !== null) {
+        return;
       }
-    }
+
+      const currentQuestion = this.state.questions[this.state.index];
+      const correctAnswer = currentQuestion.answers.find(
+        (answer) => answer.correct === true
+      );
+
+      const isCorrect =
+        correctAnswer !== undefined && correctAnswer.id === selectedAnswer.id;
+
+      this.setState({
+        correct: isCorrect,
+        score: this.state.score + (isCorrect ? 100 : 0)
+      });
+    };
 
     nextQuestion(){
       this.setState({
