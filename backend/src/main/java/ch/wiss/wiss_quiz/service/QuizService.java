@@ -35,7 +35,7 @@ public class QuizService {
             Collections.shuffle(copy);
             
         }
-        int limit = Math.min(questions.size(), maxQuestions);
+        int limit = Math.min(copy.size(), maxQuestions);
         return copy.subList(0, limit);
     }
 
@@ -59,11 +59,15 @@ public class QuizService {
 
         List<Question> questions = questionRepository.findByCategory(cat);
 
-        if (!hasEnoughQuestions(questions)) {
-            throw new IllegalStateException("Not enough questions for quiz");
+        List<Question> validQuestions = questions.stream()
+                .filter(this::validateQuestionForQuiz)
+                .toList();
+
+        if (validQuestions.size() < 3) {
+            throw new IllegalStateException("Not enough valid questions for quiz");
         }
 
-        return pickQuizQuestions(questions, 3);
+        return pickQuizQuestions(validQuestions, 3);
     }
     
     public boolean validateQuestionForQuiz(Question question) {
