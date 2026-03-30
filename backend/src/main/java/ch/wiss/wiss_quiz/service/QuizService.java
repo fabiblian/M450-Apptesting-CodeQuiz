@@ -3,6 +3,7 @@ package ch.wiss.wiss_quiz.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.stereotype.Service;
 
@@ -32,8 +33,9 @@ public class QuizService {
         List<Question> copy = new ArrayList<>(questions);
 
         if (copy.size() > maxQuestions) {
-            Collections.shuffle(copy);
-            
+        	//Random random = new Random();
+        	Random random = new Random(42); // set random seed for predictable results for Selenium-tests
+        	Collections.shuffle(copy, random);            
         }
         int limit = Math.min(copy.size(), maxQuestions);
         return copy.subList(0, limit);

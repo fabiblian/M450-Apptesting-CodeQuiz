@@ -102,9 +102,11 @@ class GameSession extends React.Component {
     let feedback = "";
     if (this.state.correct !== null) {
       feedback = (
-        <div>
-          <h4>{this.state.correct ? "Hurra" : "Ohh nein"}</h4>
-          <button onClick={this.nextQuestion}>Next</button>
+        <div data-testid="feedback-area">
+          <h4 data-testid="feedback-text">{this.state.correct ? "Hurra" : "Ohh nein"}</h4>
+          <button data-testid="next-button" onClick={this.nextQuestion}>
+            Next
+          </button>
         </div>
       );
     }
@@ -120,14 +122,14 @@ class GameSession extends React.Component {
       );
     } else if (this.state.questions.length === 0) {
       q = (
-        <div>
+        <div data-testid="error-area">
           <h1>Error fetching questions</h1>
           <h2>Please fix me</h2>
         </div>
       );
     } else {
       q = (
-        <div>
+        <div data-testid="quiz-finished">
           <h1>Congrats, you made it!</h1>
           <h2>No more questions</h2>
         </div>
@@ -140,6 +142,7 @@ class GameSession extends React.Component {
           <label htmlFor="category-select">Kategorie: </label>
           <select
             id="category-select"
+            data-testid="category-select"
             value={this.state.selectedCategory}
             onChange={this.handleCategoryChange}
           >
@@ -151,6 +154,7 @@ class GameSession extends React.Component {
           </select>
 
           <button
+            data-testid="start-quiz-button"
             style={{ marginLeft: "0.5rem" }}
             onClick={this.startQuizForSelectedCategory}
           >
@@ -158,7 +162,7 @@ class GameSession extends React.Component {
           </button>
         </div>
 
-        <div>
+        <div data-testid="score-text">
           Question: {Math.min(this.state.questions.length, this.state.index + 1)} /{" "}
           {this.state.questions.length} Score: {this.state.score}
         </div>
