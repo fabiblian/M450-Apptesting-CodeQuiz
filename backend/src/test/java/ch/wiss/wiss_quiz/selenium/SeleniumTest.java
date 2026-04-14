@@ -14,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 class SeleniumTest {
@@ -57,8 +58,24 @@ class SeleniumTest {
                 By.cssSelector("[data-testid='next-button']")));
     }
 
+    private String getCorrectAnswerForTestingCategoryQuestion(String question) {
+        return switch (question) {
+            case "Welcher Test prüft eine einzelne Methode isoliert?" -> "Unit-Test";
+            case "Welches Framework wird in eurem Projekt für Unit-Tests verwendet?" -> "JUnit";
+            case "Wozu dient Mockito?" -> "Zum Mocken von Abhängigkeiten";
+            case "Was beschreibt die Testpyramide am besten?" -> "Viele Unit-Tests, wenige End-to-End-Tests";
+            case "Welche Testart prüft das Zusammenspiel mehrerer Komponenten?" -> "Integrationstest";
+            case "Welche Testart prüft die Anwendung als Ganzes aus Benutzersicht?" -> "Systemtest";
+            case "Was bedeutet Arrange-Act-Assert?" -> "Vorbereiten-Ausführen-Prüfen";
+            case "Warum sind automatisierte Tests bei Regressionen nützlich?" -> "Weil man Fehler nach Änderungen schnell erkennt";
+            case "Was ist ein Mock?" -> "Ein Platzhalter für eine Abhängigkeit im Test";
+            case "Was ist ein typischer Grenzwerttest?" -> "59%, 60%, 61% prüfen";
+            default -> throw new IllegalArgumentException("Unbekannte Testfrage: " + question);
+        };
+    }
+
     // ============================
-    // 🟢 Beispieltests (gegeben)
+    // Beispieltests (gegeben)
     // ============================
 
     @Test
@@ -83,7 +100,7 @@ class SeleniumTest {
     }
 
     // ============================
-    // 🟡 Aufgabe 1
+    // Aufgabe 1
     // ============================
 
     @Test
@@ -100,7 +117,7 @@ class SeleniumTest {
         wait.until(ExpectedConditions.visibilityOfElementLocated(
                 By.cssSelector("[data-testid='next-button']")
             ));
-    
+
         // 4. Prüfe, dass er sichtbar ist
         String bodyText = driver.findElement(By.tagName("body")).getText();
 
@@ -109,7 +126,7 @@ class SeleniumTest {
     }
 
     // ============================
-    // 🟡 Aufgabe 2
+    // Aufgabe 2
     // ============================
 
     @Test
@@ -125,7 +142,7 @@ class SeleniumTest {
     }
 
     // ============================
-    // 🔴 Aufgabe 3
+    // Aufgabe 3
     // ============================
 
     @Test
@@ -141,7 +158,7 @@ class SeleniumTest {
     }
 
     // ============================
-    // 🔴 Aufgabe 4 (schwer)
+    // Aufgabe 4 (schwer)
     // ============================
 
     @Test
@@ -156,7 +173,7 @@ class SeleniumTest {
     }
 
     // ============================
-    // 🔴 Aufgabe 5 (Bonus)
+    // Aufgabe 5 (Bonus)
     // ============================
 
     @Test
@@ -169,24 +186,35 @@ class SeleniumTest {
         // 3. Prüfen, dass sich die Fragen ändern
         assertTrue(false);
     }
-    
+
     // ============================
-    // 🔴 Aufgabe 6 (Bonus)
-    // ============================  
+    // Aufgabe 6 (Bonus)
+    // ============================
     @Test
     void selectCategory_and_answerFirstQuestion_correctly() {
-    	// Tipp:
-    	// - Combobox = Select
-    	// - Klasse: org.openqa.selenium.support.ui.Select
-    	
-        // TODO:
-        // 1. Öffne die Seite (Startseite, nicht /quiz!)
-        // 2. Finde die Kategorie-Combobox
-        // 3. Wähle "Applikationen testen"
-        // 4. Klicke auf "Quiz starten"
-        // 5. Warte bis die Frage erscheint
-        // 6. Klicke die richtige Antwort
-        // 7. Prüfe, dass der Score 100 ist
-    	assertTrue(false);
+        driver.get("http://localhost:3000/");
+        wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Quiz"))).click();
+
+        WebElement categorySelect = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("[data-testid='category-select']")));
+        new Select(categorySelect).selectByVisibleText("Applikationen testen");
+
+        WebElement orderSelect = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("[data-testid='order-select']")));
+        assertEquals("Fix", new Select(orderSelect).getFirstSelectedOption().getText());
+
+        wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("[data-testid='start-quiz-button']"))).click();
+
+        String firstQuestion = questionText().getText();
+        String correctAnswer = getCorrectAnswerForTestingCategoryQuestion(firstQuestion);
+
+        wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//button[normalize-space()='" + correctAnswer + "']"))).click();
+
+        WebElement scoreText = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("[data-testid='score-text']")));
+
+        assertTrue(scoreText.getText().contains("Score: 100"));
     }
 }

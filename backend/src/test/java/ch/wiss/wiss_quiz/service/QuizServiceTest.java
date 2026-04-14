@@ -42,6 +42,32 @@ class QuizServiceTest {
         assertEquals(3, result.size());
     }
 
+    @Test
+    void pickQuizQuestions_fixed_returnsFirstQuestionsInStableOrder() {
+        Question q1 = createQuestionWithText("Q1");
+        Question q2 = createQuestionWithText("Q2");
+        Question q3 = createQuestionWithText("Q3");
+        Question q4 = createQuestionWithText("Q4");
+
+        List<Question> result = service.pickQuizQuestions(List.of(q1, q2, q3, q4), 3, "fixed");
+
+        assertEquals(List.of(q1, q2, q3), result);
+    }
+
+    @Test
+    void pickQuizQuestions_random_returnsRequestedAmountFromInput() {
+        Question q1 = createQuestionWithText("Q1");
+        Question q2 = createQuestionWithText("Q2");
+        Question q3 = createQuestionWithText("Q3");
+        Question q4 = createQuestionWithText("Q4");
+
+        List<Question> input = List.of(q1, q2, q3, q4);
+        List<Question> result = service.pickQuizQuestions(input, 3, "random");
+
+        assertEquals(3, result.size());
+        assertTrue(input.containsAll(result));
+    }
+
     // Station 1 – Standardfälle (Happy Path)
     @Test
     void doesNotModifyOriginalList() {
@@ -292,6 +318,12 @@ class QuizServiceTest {
                 createAnswer("A", true),
                 createAnswer("B", false)
         );
+    }
+
+    private Question createQuestionWithText(String text) {
+        Question question = new Question();
+        question.setQuestion(text);
+        return question;
     }
 
     private Answer createAnswer(String text, boolean correct) {

@@ -74,6 +74,42 @@ class QuizServiceMockitoTest {
         assertEquals(3, result.size());
     }
 
+    @Test
+    void getQuizQuestionsByCategoryId_usesFixedOrderByDefault() {
+        Category category = new Category();
+        Question q1 = createValidQuestion("Q1");
+        Question q2 = createValidQuestion("Q2");
+        Question q3 = createValidQuestion("Q3");
+        Question q4 = createValidQuestion("Q4");
+        List<Question> questions = List.of(q1, q2, q3, q4);
+
+        when(categoryRepository.findById(1)).thenReturn(Optional.of(category));
+        when(questionRepository.findByCategory(category)).thenReturn(questions);
+
+        List<Question> result = service.getQuizQuestionsByCategoryId(1, "fixed");
+
+        assertEquals(List.of(q1, q2, q3), result);
+    }
+
+    @Test
+    void getQuizQuestionsByCategoryId_returnsThreeQuestions_whenRandomOrderIsRequested() {
+        Category category = new Category();
+        List<Question> questions = List.of(
+                createValidQuestion("Q1"),
+                createValidQuestion("Q2"),
+                createValidQuestion("Q3"),
+                createValidQuestion("Q4")
+        );
+
+        when(categoryRepository.findById(1)).thenReturn(Optional.of(category));
+        when(questionRepository.findByCategory(category)).thenReturn(questions);
+
+        List<Question> result = service.getQuizQuestionsByCategoryId(1, "random");
+
+        assertEquals(3, result.size());
+        assertTrue(questions.containsAll(result));
+    }
+
     // Station 4 – Service und Datenbank (Mockito)
     @Test
     void getQuizQuestionsByCategoryId_throwsException_whenNotEnoughValidQuestionsExist() {
