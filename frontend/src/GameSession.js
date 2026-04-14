@@ -15,12 +15,14 @@ class GameSession extends React.Component {
       questions: typeof props.questions === "undefined" ? [] : props.questions,
       correct: null,
       categories: [],
-      selectedCategory: ""
+      selectedCategory: "",
+      selectedOrder: "fixed"
     };
 
     this.fetchAnswer = this.fetchAnswer.bind(this);
     this.nextQuestion = this.nextQuestion.bind(this);
     this.handleCategoryChange = this.handleCategoryChange.bind(this);
+    this.handleOrderChange = this.handleOrderChange.bind(this);
     this.startQuizForSelectedCategory = this.startQuizForSelectedCategory.bind(this);
   }
 
@@ -52,12 +54,24 @@ class GameSession extends React.Component {
     });
   }
 
+  handleOrderChange(event) {
+    this.setState({
+      selectedOrder: event.target.value
+    });
+  }
+
   startQuizForSelectedCategory() {
     if (!this.state.selectedCategory) {
       return;
     }
 
-    fetch(API_BASE_URL + "/quiz?cat_id=" + this.state.selectedCategory)
+    fetch(
+      API_BASE_URL +
+        "/quiz?cat_id=" +
+        this.state.selectedCategory +
+        "&order=" +
+        this.state.selectedOrder
+    )
       .then((response) => response.json())
       .then((data) =>
         this.setState({
@@ -151,6 +165,19 @@ class GameSession extends React.Component {
                 {cat.name}
               </option>
             ))}
+          </select>
+
+          <label htmlFor="order-select" style={{ marginLeft: "0.75rem" }}>
+            Reihenfolge:
+          </label>
+          <select
+            id="order-select"
+            data-testid="order-select"
+            value={this.state.selectedOrder}
+            onChange={this.handleOrderChange}
+          >
+            <option value="fixed">Fix</option>
+            <option value="random">Random</option>
           </select>
 
           <button

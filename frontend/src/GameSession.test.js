@@ -73,11 +73,12 @@ describe("GameSession", () => {
     render(<GameSession />);
 
     expect(await screen.findByTestId("category-select")).toBeInTheDocument();
+    expect(screen.getByTestId("order-select")).toHaveValue("fixed");
     expect(screen.getByTestId("start-quiz-button")).toBeInTheDocument();
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenNthCalledWith(1, "http://localhost:8080/category");
-      expect(global.fetch).toHaveBeenNthCalledWith(2, "http://localhost:8080/quiz?cat_id=1");
+      expect(global.fetch).toHaveBeenNthCalledWith(2, "http://localhost:8080/quiz?cat_id=1&order=fixed");
     });
 
     expect(await screen.findByText("DB Frage")).toBeInTheDocument();
@@ -114,11 +115,40 @@ describe("GameSession", () => {
     fireEvent.click(screen.getByTestId("start-quiz-button"));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenNthCalledWith(3, "http://localhost:8080/quiz?cat_id=4");
+      expect(global.fetch).toHaveBeenNthCalledWith(3, "http://localhost:8080/quiz?cat_id=4&order=fixed");
     });
 
     expect(await screen.findByText("Test Frage")).toBeInTheDocument();
     expect(screen.getByTestId("score-text")).toHaveTextContent("Score: 0");
     expect(screen.queryByText("Hurra")).not.toBeInTheDocument();
+  });
+
+  test("changing order to random uses random query parameter", async () => {
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce({
+        json: () => Promise.resolve(categories)
+      })
+      .mockResolvedValueOnce({
+        json: () => Promise.resolve([createQuestion(11, "DB Frage", "SELECT")])
+      })
+      .mockResolvedValueOnce({
+        json: () => Promise.resolve([createQuestion(12, "DB Frage Random", "UPDATE")])
+      });
+
+    render(<GameSession />);
+
+    await screen.findByText("DB Frage");
+
+    fireEvent.change(screen.getByTestId("order-select"), {
+      target: { value: "random" }
+    });
+    fireEvent.click(screen.getByTestId("start-quiz-button"));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenNthCalledWith(3, "http://localhost:8080/quiz?cat_id=1&order=random");
+    });
+
+    expect(await screen.findByText("DB Frage Random")).toBeInTheDocument();
   });
 });
