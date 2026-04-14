@@ -1,27 +1,34 @@
-import { render, screen } from '@testing-library/react';
-import QuestionList from './QuestionList';
+import { render, screen } from "@testing-library/react";
+import QuestionList from "./QuestionList";
 
+describe("QuestionList", () => {
+  beforeEach(() => {
+    global.fetch = jest.fn(() => new Promise(() => {}));
+  });
 
-test("Table is properly renedered", () => {
-    // Arrange
-    let questions = [
-        {
-          id: "myId",
-          question: "Meine BeispielFrage",
-          answers: ["Antwort 1", "Antwort 2", "Antwort 3"],
-          correct_answer: "Meine Antwort 1",
-        }
-    ]
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
 
-    // Act
-    render(
-        <QuestionList questions={ questions } />
-    )
+  test("table is properly rendered", async () => {
+    const questions = [
+      {
+        id: "myId",
+        question: "Meine BeispielFrage",
+        answers: [
+          { id: 1, answer: "Antwort 1", correct: true },
+          { id: 2, answer: "Antwort 2", correct: false },
+          { id: 3, answer: "Antwort 3", correct: false }
+        ]
+      }
+    ];
 
-    // Assert
-    expect(screen.getByText("Meine BeispielFrage"));
-    expect(screen.getByText("Antwort 1"));
-    expect(screen.getByText("Antwort 2"));
-    expect(screen.getByText("Antwort 3"));
-    expect(screen.getByText("Meine Antwort 1"));
+    render(<QuestionList questions={questions} />);
+
+    expect(await screen.findByText("Meine BeispielFrage")).toBeInTheDocument();
+    expect(screen.getByText("Antwort 1")).toBeInTheDocument();
+    expect(screen.getByText("Antwort 2")).toBeInTheDocument();
+    expect(screen.getByText("Antwort 3")).toBeInTheDocument();
+    expect(screen.getByText("Wird nicht verraten ;)")).toBeInTheDocument();
+  });
 });
