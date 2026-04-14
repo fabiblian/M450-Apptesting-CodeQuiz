@@ -19,7 +19,8 @@ public class QuizController {
     private QuizService quizService;
 
     @GetMapping(path = "")
-    public List<Question> getQuizQuestions(@RequestParam Integer cat_id) {
-        return quizService.getQuizQuestionsByCategoryId(cat_id);
+    public List<Question> getQuizQuestions(@RequestParam Integer cat_id,
+                                           @RequestParam(defaultValue = "fixed") String order) {
+        return quizService.getQuizQuestionsByCategoryId(cat_id, order);
     }
 }

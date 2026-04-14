@@ -26,16 +26,18 @@ public class QuizService {
     }
 
     public List<Question> pickQuizQuestions(List<Question> questions, int maxQuestions) {
+        return pickQuizQuestions(questions, maxQuestions, "fixed");
+    }
+
+    public List<Question> pickQuizQuestions(List<Question> questions, int maxQuestions, String order) {
         if (questions == null || questions.isEmpty() || maxQuestions <= 0) {
             return List.of();
         }
 
         List<Question> copy = new ArrayList<>(questions);
 
-        if (copy.size() > maxQuestions) {
-        	//Random random = new Random();
-        	Random random = new Random(42); // set random seed for predictable results for Selenium-tests
-        	Collections.shuffle(copy, random);            
+        if ("random".equalsIgnoreCase(order) && copy.size() > 1) {
+            Collections.shuffle(copy, new Random());
         }
         int limit = Math.min(copy.size(), maxQuestions);
         return copy.subList(0, limit);
@@ -57,6 +59,10 @@ public class QuizService {
     }
 
     public List<Question> getQuizQuestionsByCategoryId(Integer catId) {
+        return getQuizQuestionsByCategoryId(catId, "fixed");
+    }
+
+    public List<Question> getQuizQuestionsByCategoryId(Integer catId, String order) {
         Category cat = categoryRepository.findById(catId).orElseThrow();
 
         List<Question> questions = questionRepository.findByCategory(cat);
@@ -69,7 +75,7 @@ public class QuizService {
             throw new IllegalStateException("Not enough valid questions for quiz");
         }
 
-        return pickQuizQuestions(validQuestions, 3);
+        return pickQuizQuestions(validQuestions, 3, order);
     }
     
     public boolean validateQuestionForQuiz(Question question) {
