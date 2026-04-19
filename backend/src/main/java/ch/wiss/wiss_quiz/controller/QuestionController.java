@@ -2,57 +2,84 @@ package ch.wiss.wiss_quiz.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;       // Das allgemeine Stream-Interface
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import ch.wiss.wiss_quiz.dto.CategoryDTO;
+import ch.wiss.wiss_quiz.dto.QuestionDTO;
+import org.springframework.web.bind.annotation.*;
 
 import ch.wiss.wiss_quiz.model.Answer;
+
 import ch.wiss.wiss_quiz.model.AnswerRepository;
 import ch.wiss.wiss_quiz.model.Category;
 import ch.wiss.wiss_quiz.model.CategoryRepository;
 import ch.wiss.wiss_quiz.model.Question;
 import ch.wiss.wiss_quiz.model.QuestionRepository;
 
-@Controller // This means that this class is a Controller
+@RestController // This means that this class is a Controller
 @RequestMapping(path="/question") // This means URL's start with /question (after Application path)
 public class QuestionController {
-  @Autowired
-  private QuestionRepository questionRepository;
-  @Autowired
-  private CategoryRepository categoryRepository;
-  @Autowired
-  private AnswerRepository answerRepository;
-  
+
+
+    /**
+     * Dependency Injection zu Respositories
+     */
+    private QuestionRepository questionRepository;
+
+    private CategoryRepository categoryRepository;
+
+    private AnswerRepository answerRepository;
+
+    public QuestionController(QuestionRepository questionRepository, CategoryRepository categoryRepository, AnswerRepository answerRepository) {
+        this.questionRepository = questionRepository;
+        this.categoryRepository = categoryRepository;
+        this.answerRepository = answerRepository;
+
+    }
+
+    //@CrossOrigin(origins = "http://localhost:3000")
+
+
+    @PostMapping(path = "/{cat_id}/addquestion")
+    public String addNewQuestion(
+            @PathVariable(value = "cat_id") Integer catId,
+            @RequestBody QuestionDTO questionDTO) {
+
+        // 1. Kategorie aus DB laden
+        Category category = categoryRepository.findById(catId)
+                .orElseThrow(() -> new RuntimeException("Category not found with id " + catId));
+
+        // 2. Question-Entity erstellen
+        Question question = new Question();
+        question.setQuestion(questionDTO.getQuestion()); // Der Text der Frage
+        question.setCategory(category);
+
+        // 3. Frage speichern (erzeugt die ID in der DB)
+        Question savedQuestion = questionRepository.save(question);
+
+        // 4. Antworten verarbeiten (Stream-Logik korrigiert)
+        if (questionDTO.getAnswers() != null) {
+            List<Answer> answers = questionDTO.getAnswers().stream()
+                    .map(answerDto -> {
+                        Answer answer = new Answer();
+                        answer.setAnswer(answerDto.getText()); // Den Text aus dem DTO holen
+                        answer.setCorrect(answerDto.isCorrect());    // Boolean-Wert setzen
+                        answer.setQuestion(savedQuestion);           // Verknüpfung zur neuen Frage
+                        return answer;
+                    })
+                    .collect(Collectors.toList());
+
+            // 5. Alle Antworten auf einmal speichern
+            answerRepository.saveAll(answers);
+        }
+
+        return "Frage und Antworten erfolgreich gespeichert!";
+    }
+
   //@CrossOrigin(origins = "http://localhost:3000")
-  @PostMapping(path="/{cat_id}") // Map ONLY POST Requests
-  public @ResponseBody String addNewQuestion(@PathVariable(value="cat_id") Integer catId, @RequestBody Question question) {
-      
-	Optional<Category> cat = categoryRepository.findById(catId);
-	question.setCategory(cat.get());
-	// we need to store nested Answer-Objects seperately
-	List<Answer> answers = List.copyOf(question.getAnswers());
-	
-	question.setAnswers(null);
-	questionRepository.save(question);
-	
-	// we need to store nested Answer-Objects seperately
-	answers.forEach(a -> {
-		a.setQuestion(question);
-		answerRepository.save(a);
-	});
-	
-	return "Saved";
-  }
-  
-  //@CrossOrigin(origins = "http://localhost:3000")
-  @GetMapping(path="")
-  public @ResponseBody Iterable<Question> getAllQuestions() {    
+  @GetMapping(path="/all")
+  public  Iterable<Question> getAllQuestions() {
     return questionRepository.findAll();
   } 
     

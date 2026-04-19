@@ -2,7 +2,6 @@ package ch.wiss.wiss_quiz.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,12 +14,16 @@ import ch.wiss.wiss_quiz.service.QuizService;
 @RequestMapping(path = "/quiz")
 public class QuizController {
 
-    @Autowired
+
     private QuizService quizService;
+
+    public QuizController(QuizService quizService) {
+        this.quizService = quizService;
+    }
 
     @GetMapping(path = "")
     public List<Question> getQuizQuestions(@RequestParam Integer cat_id,
                                            @RequestParam(defaultValue = "fixed") String order) {
-        return quizService.getQuizQuestionsByCategoryId(cat_id, order);
+        return quizService.pickQuizQuestions(cat_id, order);
     }
 }

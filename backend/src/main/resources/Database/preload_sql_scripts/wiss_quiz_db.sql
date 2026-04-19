@@ -4,9 +4,9 @@ DROP DATABASE IF EXISTS wiss_quiz;
 CREATE DATABASE wiss_quiz CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 USE wiss_quiz;
 
-DROP USER IF EXISTS 'wiss_quiz'@'%';
-CREATE USER 'wiss_quiz'@'%' IDENTIFIED BY 'wiss_quiz';
-GRANT ALL PRIVILEGES ON wiss_quiz.* TO 'wiss_quiz'@'%';
+DROP USER IF EXISTS 'wiss_quiz'@'localhost';
+CREATE USER 'wiss_quiz'@'localhost' IDENTIFIED BY 'wiss_quiz';
+GRANT ALL PRIVILEGES ON wiss_quiz.* TO 'wiss_quiz'@'localhost';
 
 CREATE TABLE `category` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -346,3 +346,6 @@ INSERT INTO `answer` VALUES
 (198,'cat',1,50),
 (199,'cp',0,50),
 (200,'rm',0,50);
+
+ALTER USER 'wiss_quiz'@'localhost' IDENTIFIED BY 'wiss_quiz';
+FLUSH PRIVILEGES;

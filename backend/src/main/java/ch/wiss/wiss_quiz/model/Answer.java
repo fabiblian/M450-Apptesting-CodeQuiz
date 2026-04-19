@@ -22,6 +22,7 @@ public class Answer {
 	private String answer;
 	private boolean correct;
 
+
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "question_id", nullable = false)
 	@JsonBackReference
@@ -34,6 +35,7 @@ public class Answer {
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 
 	public String getAnswer() {
 		return answer;

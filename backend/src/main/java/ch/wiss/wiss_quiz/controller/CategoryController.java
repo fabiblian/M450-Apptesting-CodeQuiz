@@ -1,24 +1,56 @@
-package ch.wiss.wiss_quiz.controller;
+    package ch.wiss.wiss_quiz.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import ch.wiss.wiss_quiz.model.Category;
-import ch.wiss.wiss_quiz.model.CategoryRepository;
 
-@RestController
-@RequestMapping(path = "/category")
-public class CategoryController {
+    import ch.wiss.wiss_quiz.dto.CategoryDTO;
+    import org.springframework.web.bind.annotation.*;
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    import ch.wiss.wiss_quiz.model.Category;
+    import ch.wiss.wiss_quiz.model.CategoryRepository;
 
-    @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping(path = "")
-    public Iterable<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    @RestController
+    @RequestMapping(path = "/category")
+    public class CategoryController {
+
+
+        /**
+         * Dependency Injetion auf Repository
+         */
+        private CategoryRepository categoryRepository;
+
+
+        public CategoryController(CategoryRepository categoryRepository) {
+            this.categoryRepository = categoryRepository;
+        }
+
+        @CrossOrigin(origins = "http://localhost:3000")
+        @GetMapping(path = "")
+        public Iterable<Category> getAllCategories() {
+            return categoryRepository.findAll();
+        }
+
+
+
+        @PostMapping(path="/addcategory")
+        public CategoryDTO addCategory(@RequestBody CategoryDTO categoryDTO) {
+            // 1. DTO -> Entity umwandeln
+            Category category = new Category();
+            category.setName(categoryDTO.getName());
+
+            // 2. Speichern
+            Category savedCategory = categoryRepository.save(category);
+
+            // 3. Entity -> DTO zurückgeben
+            return new CategoryDTO(
+                    savedCategory.getId(),
+                    savedCategory.getName()
+            );
+        }
+
+
+
+
+
+
+
     }
-}

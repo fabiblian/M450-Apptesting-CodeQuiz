@@ -43,7 +43,7 @@ public class Question {
 	public void setQuestion(String question) {
 		this.question = question;
 	}
-	
+
 	public void setCategory(Category cat) {
 		this.category = cat;
 	}
