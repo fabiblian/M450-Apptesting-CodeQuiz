@@ -33,7 +33,6 @@ public class QuizService {
         List<Question> copy = new ArrayList<>(questions);
 
         if (copy.size() > maxQuestions) {
-        	//Random random = new Random();
         	Random random = new Random(42); // set random seed for predictable results for Selenium-tests
         	Collections.shuffle(copy, random);            
         }
@@ -56,7 +55,7 @@ public class QuizService {
         return percent >= 60;
     }
 
-    public List<Question> getQuizQuestionsByCategoryId(Integer catId) {
+    public List<Question> getQuizQuestionsByCategoryId(Integer catId, String order) {
         Category cat = categoryRepository.findById(catId).orElseThrow();
 
         List<Question> questions = questionRepository.findByCategory(cat);

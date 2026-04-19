@@ -25,6 +25,10 @@ class GlobalNavigation extends React.Component{
               <li>
                 <Link to="/aboutus">About Us</Link>
               </li>
+
+              <li>
+                <Link to="/login">Login</Link>
+              </li>
             </ul>
           </nav>
         )

@@ -2,10 +2,8 @@ import React from "react";
 import "./GameSession.css";
 import Question from "./Question.js";
 import API_BASE_URL from "./api";
+import { useNavigate } from "react-router-dom";
 
-/**
- * handles a set of Questions
- */
 class GameSession extends React.Component {
   constructor(props) {
     super(props);
@@ -16,7 +14,9 @@ class GameSession extends React.Component {
       correct: null,
       categories: [],
       selectedCategory: "",
-      selectedOrder: "fixed"
+      selectedOrder: "fixed",
+      correctAnswersCount:0
+     
     };
 
     this.fetchAnswer = this.fetchAnswer.bind(this);
@@ -78,7 +78,8 @@ class GameSession extends React.Component {
           questions: data,
           index: 0,
           score: 0,
-          correct: null
+          correct: null,
+          correctAnswersCount: 0 // Reset bei Neustart
         })
       )
       .catch((err) => {
@@ -89,6 +90,7 @@ class GameSession extends React.Component {
   fetchAnswer = (selectedAnswer) => {
     if (this.state.correct !== null) {
       return;
+      alert("Korrekte Antwort+100 Punkte");
     }
 
     const currentQuestion = this.state.questions[this.state.index];
@@ -97,18 +99,21 @@ class GameSession extends React.Component {
     );
 
     const isCorrect =
-      correctAnswer !== undefined && correctAnswer.id === selectedAnswer.id;
+      correctAnswer !== undefined && String(correctAnswer.id) === String(selectedAnswer.id);
+    alert(`Die Frage wurde korrekt beantwortet: ${correctAnswer.text}`);
 
-    this.setState({
+    this.setState((prevState) => ({
       correct: isCorrect,
-      score: this.state.score + (isCorrect ? 100 : 0)
-    });
-  };
+      score: isCorrect ? prevState.score + 100 : prevState.score - 100
+      
+    }));
+  }; // Hier war die schließende Klammer der Funktion
 
   nextQuestion() {
     this.setState({
       index: this.state.index + 1,
       correct: null
+      
     });
   }
 
@@ -191,15 +196,30 @@ class GameSession extends React.Component {
 
         <div data-testid="score-text">
           Question: {Math.min(this.state.questions.length, this.state.index + 1)} /{" "}
-          {this.state.questions.length} Score: {this.state.score}
+          {this.state.questions.length} | Score: {this.state.score}
         </div>
 
         {q}
-
         {feedback}
+
+        <div>
+          <h2>Auswertung: {this.state.score}</h2>
+        </div>
+
+        <button 
+          className="button1"
+          type="button" 
+          onClick={() => this.props.navigate("/questionslist")}
+        >
+          Zu den Quizfragen
+        </button>
       </div>
     );
-  }
+  } // Ende von render()
+} // Ende der Klasse GameSession
+
+function withNavigation(Component) {
+  return props => <Component {...props} navigate={useNavigate()} />;
 }
 
-export default GameSession;
+export default withNavigation(GameSession);

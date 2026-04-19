@@ -24,6 +24,9 @@ public class QuizController {
     @GetMapping(path = "")
     public List<Question> getQuizQuestions(@RequestParam Integer cat_id,
                                            @RequestParam(defaultValue = "fixed") String order) {
-        return quizService.pickQuizQuestions(cat_id, order);
+        return quizService.getQuizQuestionsByCategoryId(cat_id, order);
     }
+
+
+
 }

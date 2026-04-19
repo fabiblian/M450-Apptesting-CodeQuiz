@@ -44,7 +44,7 @@ class QuizServiceMockitoTest {
         when(categoryRepository.findById(1)).thenReturn(Optional.of(category));
         when(questionRepository.findByCategory(category)).thenReturn(questions);
 
-        assertThrows(IllegalStateException.class, () -> service.getQuizQuestionsByCategoryId(1));
+        assertThrows(IllegalStateException.class, () -> service.getQuizQuestionsByCategoryId(1, order));
     }
 
     // Station 4 – Service und Datenbank (Mockito)
@@ -52,7 +52,7 @@ class QuizServiceMockitoTest {
     void getQuizQuestionsByCategoryId_throwsException_whenCategoryDoesNotExist() {
         when(categoryRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> service.getQuizQuestionsByCategoryId(99));
+        assertThrows(RuntimeException.class, () -> service.getQuizQuestionsByCategoryId(99, order));
     }
 
     // Station 4 – Service und Datenbank (Mockito)
@@ -69,7 +69,7 @@ class QuizServiceMockitoTest {
         when(categoryRepository.findById(1)).thenReturn(Optional.of(category));
         when(questionRepository.findByCategory(category)).thenReturn(questions);
 
-        List<Question> result = service.getQuizQuestionsByCategoryId(1);
+        List<Question> result = service.getQuizQuestionsByCategoryId(1, order);
 
         assertEquals(3, result.size());
     }
@@ -123,7 +123,7 @@ class QuizServiceMockitoTest {
         when(categoryRepository.findById(1)).thenReturn(Optional.of(category));
         when(questionRepository.findByCategory(category)).thenReturn(questions);
 
-        assertThrows(IllegalStateException.class, () -> service.getQuizQuestionsByCategoryId(1));
+        assertThrows(IllegalStateException.class, () -> service.getQuizQuestionsByCategoryId(1, order));
     }
 
     // Station 4 – Service und Datenbank (Mockito)
@@ -204,7 +204,7 @@ class QuizServiceMockitoTest {
         when(categoryRepository.findById(1)).thenReturn(Optional.of(category));
         when(questionRepository.findByCategory(category)).thenReturn(questions);
 
-        service.getQuizQuestionsByCategoryId(1);
+        service.getQuizQuestionsByCategoryId(1, order);
 
         verify(categoryRepository).findById(1);
         verify(questionRepository).findByCategory(category);

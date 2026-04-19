@@ -15,6 +15,10 @@
   }
 }
 
+
+.button1{
+  background-color: gold;
+}
 .App-header {
   display: flex;
   flex-direction: column;
@@ -37,6 +41,10 @@ hr {
   width: 99% !important;
 }
 
+
+.layout{
+  text-shadow: 2px 2px rgb(133, 8, 133);
+}
 .button-bar {
   display: grid;
   grid: auto-flow / 1fr 1fr 1fr;
@@ -81,5 +89,5 @@ nav li a {
 }
 
 nav li a:hover {
-  background-color: rgb(187, 202, 211);
+  background-color: cyan;
 }

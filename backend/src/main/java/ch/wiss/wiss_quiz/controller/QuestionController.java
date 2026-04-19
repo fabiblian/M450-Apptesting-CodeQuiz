@@ -1,11 +1,8 @@
 package ch.wiss.wiss_quiz.controller;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;       // Das allgemeine Stream-Interface
 
-import ch.wiss.wiss_quiz.dto.CategoryDTO;
 import ch.wiss.wiss_quiz.dto.QuestionDTO;
 import org.springframework.web.bind.annotation.*;
 

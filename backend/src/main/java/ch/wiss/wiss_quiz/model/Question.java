@@ -20,19 +20,19 @@ public class Question {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Integer id;
+	private  Long  id;
 	
 	private String question;
 	
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
-	
-    public Integer getId() {
+
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -47,6 +47,7 @@ public class Question {
 	public void setCategory(Category cat) {
 		this.category = cat;
 	}
+
 	
 	public Category getCategory() {
 		return category;

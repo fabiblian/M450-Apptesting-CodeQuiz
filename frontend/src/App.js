@@ -12,6 +12,9 @@ import AboutUs from './AboutUs.js';
 import NotFound from './NotFound';
 import GlobalNavigation from './GlobalNavigation';
 import QuestionList from './QuestionList';
+import Login from './pages/Login.js';
+import ProtectedRoute from './Protected-Route.js';
+import { AuthProvider } from './contexts/AuthContext.js';
 
 function App(props) {
   return (
@@ -19,12 +22,14 @@ function App(props) {
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="quiz" element={<GameSession />} />
+        <Route path="login" element={<Login />} />
+        
         <Route path="rules" element={<Rules />} />
         <Route path="aboutus" element={<AboutUs />} />
         <Route path="questionslist" element={<QuestionList />} />
-      </Route>
+        </Route>
       <Route path="*" element={<NotFound />}/>
-    </Routes>
+      </Routes>
   );
 }
 
@@ -34,7 +39,7 @@ function Layout(){
       <GlobalNavigation />
       <div className="content">
         <header className="App-header">
-          <h1>Welcome to the Wiss-Quiz</h1>
+          <marquee><h1 className='layout'>Welcome to the Wiss-Quiz</h1></marquee>
           <hr/>
           <Outlet />
           <hr/>
